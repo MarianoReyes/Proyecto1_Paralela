@@ -36,6 +36,22 @@ bool checkCollision(Entity &a, Entity &b)
 
 void resolveCollision(Entity &a, Entity &b)
 {
+    int dx = b.x - a.x;
+    int dy = b.y - a.y;
+    float distance = sqrt(dx * dx + dy * dy);
+    float overlap = a.radius + b.radius - distance;
+
+    // Normalizar el vector de desplazamiento
+    float nx = dx / distance;
+    float ny = dy / distance;
+
+    // Mover las entidades para resolver la superposición
+    a.x -= nx * overlap / 2.0;
+    a.y -= ny * overlap / 2.0;
+    b.x += nx * overlap / 2.0;
+    b.y += ny * overlap / 2.0;
+
+    // Invertir las velocidades para que se muevan en direcciones opuestas
     std::swap(a.xVel, b.xVel);
     std::swap(a.yVel, b.yVel);
 }
@@ -73,8 +89,8 @@ bool init(int numEntities, int numGhosts)
         e.radius = rand() % 20 + 10;
         e.x = rand() % (SCREEN_WIDTH - 2 * e.radius) + e.radius;
         e.y = rand() % (SCREEN_HEIGHT - 2 * e.radius) + e.radius;
-        e.xVel = rand() % 5 + 1;
-        e.yVel = rand() % 5 + 1;
+        e.xVel = rand() % 2;
+        e.yVel = rand() % 2;
         e.r = rand() % 256;
         e.g = rand() % 256;
         e.b = rand() % 256;
@@ -136,17 +152,21 @@ int main(int argc, char *args[])
         {
             for (Entity &other : entities)
             {
-                if (entity.isPacman && !other.isPacman && other.isVisible)
-                {
-                    other.isVisible = false;
-                    other.invisibleTime = currentTime;
-                }
-                else if (!entity.isPacman && other.isPacman && entity.isVisible)
-                {
-                    entity.isVisible = false;
-                    entity.invisibleTime = currentTime;
-                }
                 if (&entity != &other && checkCollision(entity, other))
+                {
+                    if (entity.isPacman && !other.isPacman && other.isVisible)
+                    {
+                        other.isVisible = false;
+                        other.invisibleTime = currentTime;
+                    }
+                    if (!entity.isPacman && other.isPacman && entity.isVisible)
+                    {
+                        entity.isVisible = false;
+                        entity.invisibleTime = currentTime;
+                    }
+                    resolveCollision(entity, other);
+                }
+                if (&entity != &entity && checkCollision(entity, entity))
                 {
                     resolveCollision(entity, other);
                 }
@@ -208,7 +228,7 @@ int main(int argc, char *args[])
             else
             {
                 // Draw Ghost as an outlined circle
-                if (!entity.isVisible)
+                if (entity.isVisible)
                 {
                     for (float angle = 0; angle <= 2 * M_PI; angle += 0.01)
                     {
