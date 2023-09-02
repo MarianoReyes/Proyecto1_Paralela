@@ -132,9 +132,15 @@ int main(int argc, char *args[])
 
     bool quit = false;
     SDL_Event e;
-
+    int lowLimit = 0;
+    int realLimit = 0;
     while (!quit)
     {
+        lowLimit++;
+        if (lowLimit % 100 == 0)
+        {
+            realLimit++;
+        }
         while (SDL_PollEvent(&e) != 0)
         {
             if (e.type == SDL_QUIT)
@@ -142,16 +148,19 @@ int main(int argc, char *args[])
                 quit = true;
             }
         }
+        int limit = std::min(realLimit, static_cast<int>(entities.size())); // Obtén el menor entre 10 y el tamaño del vector
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         Uint32 currentTime = SDL_GetTicks();
 
         // Handle collisions and drawing
-        for (Entity &entity : entities)
+        for (int i = 0; i < limit; ++i)
         {
-            for (Entity &other : entities)
+            Entity &entity = entities[i];
+            for (int j = 0; j < limit; ++j)
             {
+                Entity &other = entities[j];
                 if (&entity != &other && checkCollision(entity, other))
                 {
                     if (entity.isPacman && !other.isPacman && other.isVisible)
@@ -196,7 +205,6 @@ int main(int argc, char *args[])
                 entity.y = SCREEN_HEIGHT - entity.radius;
                 entity.yVel = -entity.yVel;
             }
-
             SDL_SetRenderDrawColor(renderer, entity.r, entity.g, entity.b, 255);
 
             if (entity.isPacman)
