@@ -15,3 +15,17 @@ And now just do
 ```
 
 And you will see the result of the simulation.
+
+## Kompilieren mit G++
+
+```bash
+cd ./src
+```
+
+```bash
+g++ sceensaversequential.cpp $(pkg-config --cflags --libs sdl2) -o screensaversequential
+```
+
+```bash
+g++ sceensaverparalel.cpp $(pkg-config --cflags --libs sdl2) -fopenmp -o screensaverparalel
+``````

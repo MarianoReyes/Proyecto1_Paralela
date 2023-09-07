@@ -72,8 +72,8 @@ bool init(int numEntities, int numGhosts)
         e.radius = rand() % 20 + 10;
         e.x = rand() % (SCREEN_WIDTH - 2 * e.radius) + e.radius;
         e.y = rand() % (SCREEN_HEIGHT - 2 * e.radius) + e.radius;
-        e.xVel = rand() % 5 + 1;
-        e.yVel = rand() % 5 + 1;
+        e.xVel = rand() % 10 + 1;
+        e.yVel = rand() % 10 + 1;
         e.r = 255;
         e.g = 255;
         e.b = 0;
